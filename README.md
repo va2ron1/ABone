@@ -1,0 +1,2 @@
+# abone
+Auto Parent Bone
