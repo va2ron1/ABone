@@ -4,7 +4,7 @@ import mathutils
 bl_info = {
     "name": "Auto Parent Bone",
     "author": "@va2ron1",
-    "version": (1, 0, 0),
+    "version": (1, 0, 1),
     "blender": (3, 1, 0),
     "location": "View 3D > Object > Parent",
     "description": "",
@@ -71,7 +71,7 @@ class ABone_OT_abone_init(bpy.types.Operator):
                 vec = bone.head - bone.tail
                 trans = mathutils.Matrix.Translation(vec)
                 bpy.data.objects[objects[index]].matrix_parent_inverse = bone.matrix_local.inverted() @ trans
-                
+            bone.use_relative_parent = True  
             bpy.ops.object.select_all(action='DESELECT')
             armature.select_set(True)
             bpy.ops.object.posemode_toggle()
