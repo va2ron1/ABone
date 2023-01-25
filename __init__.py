@@ -3,20 +3,20 @@ import mathutils
 
 bl_info = {
     "name": "Auto Parent Bone",
-    "author": "@va2ron1",
-    "version": (1, 0, 1),
+    "author": "va2ron1",
+    "version": (1, 0, 2),
     "blender": (3, 1, 0),
-    "location": "View 3D > Object > Parent",
-    "description": "",
+    "location": "Object > Parent",
+    "description": "Auto Parenting Bones with Objects",
     "warning": "",
     "wiki_url": "",
     "tracker_url": "",
-    "category": "3D View",
+    "category": "Object",
 }
 
 class ABone_OT_abone_init(bpy.types.Operator):
     bl_idname = 'abone.abone_init'
-    bl_label = 'Auto Bone'
+    bl_label = 'Auto Parent Bone'
  
     def execute(self, context):
         bpy.ops.object.posemode_toggle()
@@ -71,7 +71,8 @@ class ABone_OT_abone_init(bpy.types.Operator):
                 vec = bone.head - bone.tail
                 trans = mathutils.Matrix.Translation(vec)
                 bpy.data.objects[objects[index]].matrix_parent_inverse = bone.matrix_local.inverted() @ trans
-            bone.use_relative_parent = True  
+  
+            bone.use_relative_parent = True
             bpy.ops.object.select_all(action='DESELECT')
             armature.select_set(True)
             bpy.ops.object.posemode_toggle()
@@ -85,12 +86,28 @@ def draw_context(self, context):
     self.layout.separator()
     self.layout.operator('abone.abone_init')
 
+addon_keymaps = []
+
 def register():
     bpy.utils.register_class(ABone_OT_abone_init)
     bpy.types.VIEW3D_MT_object_parent.append(draw_context)
 
+    # Add the hotkey
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs.addon
+    if kc:
+        km = wm.keyconfigs.addon.keymaps.new(name='Object Mode', space_type='EMPTY')
+        kmi = km.keymap_items.new(ABone_OT_abone_init.bl_idname, type='P', value='PRESS', ctrl=True)
+        addon_keymaps.append((km, kmi))
+
 def unregister():
     bpy.utils.unregister_class(ABone_OT_abone_init)
+    bpy.types.VIEW3D_MT_object_parent.remove(draw_context)
+
+        # Remove the hotkey
+    for km, kmi in addon_keymaps:
+        km.keymap_items.remove(kmi)
+    addon_keymaps.clear()
 
 if __name__ == "__main__":
     register()
